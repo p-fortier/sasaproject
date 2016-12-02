@@ -1,4 +1,44 @@
+var mongodb = require('mongodb');
+var MongoClient = mongodb.MongoClient;
 const crypto = require('crypto');
+
+MongoClient.connect("mongodb://localhost/sasproject", function(error, db) {
+    if (error) {
+      console.log('Erreur : ', error);
+    }
+    else {
+      console.log("Connecté à la base de données 'sasproject'");
+
+
+    var collection = db.collection('headers');
+
+    var header1 = {name: 'patrik', age: 22};
+    var header2 = {name: 'lulu', age: 22};
+
+    collection.insert([header1, header2], function (err, res) {
+      if (err){
+        console.log('Erreur : ', err);
+      } else {
+        console.log('headers insérés dans la base')
+      }
+      db.close();
+    });
+
+    collection.find().toArray(function (err, result){
+      if (err) {
+        console.log('Erreur : ', err);
+      } else if (result.length) {
+        console.log('Found : ', result);
+      } else{
+        console.log('Pas de document trouvé !');
+      }
+      db.close();
+    });
+
+  }
+
+});
+
 
 function test(req, res, next) {
   res.status(200)
