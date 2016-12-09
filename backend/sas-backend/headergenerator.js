@@ -150,8 +150,6 @@ function association(req, res, next){
               console.log('Pas de document trouvé !');
             }
           });
-          console.log('------------------------------------TABLEAU-----------------')
-          console.log(tab);
         }
         //db.close();
       });
