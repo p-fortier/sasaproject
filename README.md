@@ -15,3 +15,6 @@ http://localhost:3000/allheaders
 
 Voir notre header:
 http://localhost:3000/headers
+
+Voir n headers selectionnés aléatoirement:
+http://localhost:3000/getselectedheaders/2

@@ -12,5 +12,6 @@ router.get('/', function(req, res, next) {
 router.get('/yo', test.test);
 router.get('/headers', test.getHeaders);
 router.get('/allheaders', test.getAllHeaders);
+router.get('/getselectedheaders/:n', test.getSelectedHeaders);
 
 module.exports = router;
