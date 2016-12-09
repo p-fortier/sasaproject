@@ -89,50 +89,72 @@ function getSelectedHeaders(req, res, next){
         }
         db.close();
 
-      })
-      /*for(var i =0; i<n; i++){
-        collection.findOne().limit(-1).skip(random(1,293)).toArray(function (err, result){
-          if (err) {
-            console.log('Erreur : ', err);
-          } else if (result.length) {
-            console.log('Headers trouvés!');
-            console.log(result);
-            tab.push(result)
-          } else{
-            console.log('Pas de document trouvé !');
-          }
-        });
-      }
-      console.log('TAB')
-      console.log(tab);
-      res.status(200)
-        .json(tab);*/
-      /*tab.toArray(function(err, result){
+      });
+    }
+  });
+}
+
+function association(req, res, next){
+
+  console.log('----------------------------MON HEADER-------------------------------')
+  const secret = 'cacamoumdrlol';
+  var jsonResponse = req.headers;
+  jsonResponse.ip = req.ip+':'+req.connection.remotePort;
+  delete jsonResponse['if-none-match'];
+  const hash = crypto.createHmac('sha256', secret)
+    .update(jsonResponse.toString())
+    .digest('hex');
+    jsonResponse.hash = hash;
+  console.log(jsonResponse);
+
+  console.log('------------------------MON ASSOCIATION-------------------------------')
+  MongoClient.connect("mongodb://localhost/sasproject", function(error, db) {
+    if (error) {
+      console.log('Erreur : ', error);
+    }
+    else {
+      console.log("Connecté à la base de données 'sasproject'");
+      var collection = db.collection('headers');
+      var assoc = db.collection('association');
+
+      assoc.find({hash:hash}).toArray(function (err, result){
         if (err) {
           console.log('Erreur : ', err);
+
         } else if (result.length) {
-          console.log('Headers trouvés!');
+          console.log('Association deja faite');
+          console.log(result[0].headers);
           res.status(200)
-            .json(result);
+            .json(result[0].headers);
+
         } else{
-          console.log('Pas de document trouvé !');
+          console.log('Creation association');
+          var n = parseInt(req.params.n);
+          console.log('Selections de ' + n + ' headers...');
+          collection.aggregate([{$sample: {size: n}}]).toArray(function(err, result){
+            if (err) {
+              console.log('Erreur : ', err);
+            } else if (result.length) {
+              console.log('Headers trouvés:');
+              assoc.insert({hash: hash, headers:result}, null, function(err, result){
+                if(err){
+                  console.log('ErReUR :', err);
+                }
+                else {
+                  console.log('ducument inséré!');
+                }
+              });
+              res.status(200)
+                .json(result);
+            } else{
+              console.log('Pas de document trouvé !');
+            }
+          });
+          console.log('------------------------------------TABLEAU-----------------')
+          console.log(tab);
         }
-        db.close();
-      });*/
-
-        /*collection.find().limit(-1).skip(random(1,293)).toArray(function (err, result){
-          if (err) {
-            console.log('Erreur : ', err);
-          } else if (result.length) {
-            console.log('Headers trouvés!');
-            res.status(200)
-              .json(result);
-          } else{
-            console.log('Pas de document trouvé !');
-          }
-          db.close();
-        });*/
-
+        //db.close();
+      });
     }
   });
 }
@@ -142,5 +164,6 @@ module.exports = {
   test: test,
   getHeaders: getHeaders,
   getAllHeaders: getAllHeaders,
-  getSelectedHeaders: getSelectedHeaders
+  getSelectedHeaders: getSelectedHeaders,
+  association: association
 }
