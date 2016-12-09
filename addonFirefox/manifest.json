@@ -4,18 +4,27 @@
   "name": "HideMyPrint",
   "version": "1.0",
 
-  "description": "Log URL",
+  "description": "fakeheaders",
 
   "icons": {
     "48": "icons/border-48.png"
   },
 
   "permissions": [
-    "webRequest"
+    "webRequestBlocking",
+    "webRequest",
+    "notifications",
+    "http://localhost:3000/"
   ],
 
   "background": {
-    "scripts": ["HideMyPrint.js"]
-  }
+    "scripts": ["background.js"]
+  },
 
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["requestHandler.js"]
+    }
+  ]
 }
