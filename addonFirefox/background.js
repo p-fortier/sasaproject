@@ -3,14 +3,22 @@ var headers = [];
 
 
 function logHeaders(requestDetails){
+  console.log("LOGHEADERS");
   var req = new XMLHttpRequest();
-  req.open( "GET", "http://localhost:3000/getselectedheaders/7", false);
+  req.open( "POST", "http://localhost:3000/association/3", false);
   req.responseType = "string";
+  req.setRequestHeader("Content-type", "application/json");
   req.onload = function() {
-    console.log(JSON.stringify(req.response));
-    headers: JSON.parse(req.response, null, 2);
+    headers = JSON.parse(req.response);
+    console.log(headers);
   }
-  req.send();
+  var body= {};
+  for(var i = 0; i < requestDetails.requestHeaders.length; i++){
+    var header = requestDetails.requestHeaders[i];
+    body[header.name] = header.value;
+  }
+  // console.log(body);
+  req.send(JSON.stringify(body));
 
   for (var i=0; i < headers.length; i++) {
     var header = headers[i];
@@ -32,6 +40,13 @@ function connected(p) {
 browser.runtime.onConnect.addListener(connected);
 browser.webRequest.onBeforeSendHeaders.addListener(
   logHeaders,
-  {urls: ["<all_urls>"]},
+  {urls: ["<all_urls>"], types: ["main_frame"]},
   ["blocking", "requestHeaders"]
 );
+
+//TODO: MAKE sendFakeQueries function !
+browser.webRequest.onSendHeaders.addListener(
+  sendFakeQueries,
+  {urls: ["<all_urls>"]},
+  ["requestHeaders"]
+)

@@ -98,14 +98,17 @@ function association(req, res, next){
 
   console.log('----------------------------MON HEADER-------------------------------')
   const secret = 'cacamoumdrlol';
-  var jsonResponse = req.headers;
+  var jsonResponse = req.body;
   jsonResponse.ip = req.ip+':'+req.connection.remotePort;
   delete jsonResponse['if-none-match'];
+  delete jsonResponse['Referer'];
+  delete jsonResponse['Accept'];
+  delete jsonResponse['Cookie'];
   const hash = crypto.createHmac('sha256', secret)
-    .update(jsonResponse.toString())
+    .update(JSON.stringify(jsonResponse))
     .digest('hex');
     jsonResponse.hash = hash;
-  console.log(jsonResponse);
+  console.log(JSON.stringify(jsonResponse));
 
   console.log('------------------------MON ASSOCIATION-------------------------------')
   MongoClient.connect("mongodb://localhost/sasproject", function(error, db) {
@@ -123,7 +126,7 @@ function association(req, res, next){
 
         } else if (result.length) {
           console.log('Association deja faite');
-          console.log(result[0].headers);
+          //console.log(result[0].headers);
           res.status(200)
             .json(result[0].headers);
 
@@ -157,11 +160,17 @@ function association(req, res, next){
   });
 }
 
+function printBody(req, res, next){
+  console.log("PRINTBODY");
+  console.log(req.body);
+  res.status(200).json(req.body);
+}
 
 module.exports = {
   test: test,
   getHeaders: getHeaders,
   getAllHeaders: getAllHeaders,
   getSelectedHeaders: getSelectedHeaders,
-  association: association
+  association: association,
+  printBody: printBody
 }
