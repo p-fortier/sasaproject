@@ -1,29 +1,37 @@
 var sender;
+var headers = [];
 
-function logURL(requestDetails) { 
-  sender.onMessage.addListener((message) => {
-    console.log("message ::::" + message.headers)
-    return {
-      text: "ehello"
-    }
-  })
-}
-browser.runtime.onConnect.addListener(connected);
+
 function logHeaders(requestDetails){
-  // console.log(requestDetails);
+  var req = new XMLHttpRequest();
+  req.open( "GET", "http://localhost:3000/getselectedheaders/7", false);
+  req.responseType = "string";
+  req.onload = function() {
+    console.log(JSON.stringify(req.response));
+    headers: JSON.parse(req.response, null, 2);
+  }
+  req.send();
+
+  for (var i=0; i < headers.length; i++) {
+    var header = headers[i];
+    console.log(header);
+  }
 }
+
 
 function connected(p) {
   console.log("Connect function");
   sender = p;
-  sender.postMessage({greeting: "hi there content script!"});
+  sender.postMessage();
+  sender.onMessage.addListener((message) => {
+    headers = message.headers;
+  });
 }
-browser.webRequest.onBeforeRequest.addListener(
-  logURL,
-  {urls: ["<all_urls>"]},
-  ["blocking"]
-);
+
+
+browser.runtime.onConnect.addListener(connected);
 browser.webRequest.onBeforeSendHeaders.addListener(
   logHeaders,
-  {urls: ["<all_urls>"]}
+  {urls: ["<all_urls>"]},
+  ["blocking", "requestHeaders"]
 );
