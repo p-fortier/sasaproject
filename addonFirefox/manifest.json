@@ -13,18 +13,10 @@
   "permissions": [
     "webRequestBlocking",
     "webRequest",
-    "notifications",
-    "http://localhost:3000/"
+    "<all_urls>"
   ],
 
   "background": {
     "scripts": ["background.js"]
-  },
-
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["requestHandler.js"]
-    }
-  ]
+  }
 }

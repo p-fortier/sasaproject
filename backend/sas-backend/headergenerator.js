@@ -53,6 +53,7 @@ function getHeaders(req, res, next) {
   var jsonResponse = req.headers;
   jsonResponse.ip = req.ip+':'+req.connection.remotePort;
   delete jsonResponse['if-none-match'];
+  delete jsonResponse['Authorization'];
   const hash = crypto.createHmac('sha256', secret)
     .update(jsonResponse.toString())
     .digest('hex');
@@ -102,6 +103,7 @@ function association(req, res, next){
   jsonResponse.ip = req.ip+':'+req.connection.remotePort;
   delete jsonResponse['if-none-match'];
   delete jsonResponse['Referer'];
+  delete jsonResponse['Authorization'];
   delete jsonResponse['Accept'];
   delete jsonResponse['Cookie'];
   const hash = crypto.createHmac('sha256', secret)
